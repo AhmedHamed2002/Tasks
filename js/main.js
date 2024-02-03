@@ -2,6 +2,7 @@ let input = document.querySelector(".input") ;
 let submit = document.querySelector(".add") ;  
 let tasksDiv =  document.querySelector(".tasks") ;
 let remove =  document.querySelector(".remove") ;
+let Done =  document.querySelector(".Done") ;
 
 // Empty Array To Store The Tasks
 let arrayOfTasks = [] ; 
@@ -14,7 +15,7 @@ getDataFormLogalStorage() ;
 
 // Add  task 
 submit.onclick = function(){
-    if( input.value !== ""){
+    if( input.value !== "" && FoundTask(input.value) ){
         addTaskToArray(input.value) ;  // Add Task  To Array of Tasks
         input.value = ""; // Empty  input field
     }
@@ -24,7 +25,15 @@ submit.onclick = function(){
 remove.onclick =function(){
     tasksDiv.innerHTML="";  
     window.localStorage.removeItem("tasks"); 
+    arrayOfTasks =[] ;  /* Remove element  from  array , 
+                        so as not to add it agian when adding new task before lock the browser*/
 } 
+
+// Done All Tasks
+Done.onclick =function(){
+    // Toggle Completed For The All Tasks
+    ToggleAll() ; 
+}
 
 // Click On Task Elemant
 tasksDiv.addEventListener("click",(e)=>{
@@ -48,6 +57,24 @@ tasksDiv.addEventListener("click",(e)=>{
     }
 })
 
+// Not found it's task (Uppercase or Lowercase) 
+function FoundTask(task)
+{
+    for(let i =0 ; i<arrayOfTasks.length ; i++)
+    { 
+        if(arrayOfTasks[i].title.toUpperCase() == task.toUpperCase())
+        {
+            input.style.color = 'rgba(228, 37, 37, 0.827)'; 
+            input.value="it's task already exists" ; 
+            setTimeout(function(){
+                input.value = "" ; 
+                input.style.color ='rgb(0,0,0)';
+            },2000)
+            return 0  ;
+        } 
+    }
+    return 1  ; 
+}
 
 function addTaskToArray(taskText)
 {
@@ -132,12 +159,25 @@ function toggleStatusTaskWith(Id)
     for (let i = 0; i < arrayOfTasks.length; i++) 
     {
         if (arrayOfTasks[i].id == Id) {
-            arrayOfTasks[i].completed == false ? (arrayOfTasks[i].completed = true) : (arrayOfTasks[i].completed = false);
+            //arrayOfTasks[i].completed == false ? (arrayOfTasks[i].completed = true) : (arrayOfTasks[i].completed = false);
+
+            arrayOfTasks[i].completed ^=1  ;  // Xor ---> if task=1 become 0 and task=0 become 1  
         }
     }
 
     //Updata To Local Storage 
     addDataToLocalStorageFrom(arrayOfTasks);
+}
+function ToggleAll() 
+{   
+    for (let i = 0; i < arrayOfTasks.length; i++) 
+    {
+        arrayOfTasks[i].completed =1 ; 
+    }
+
+    //Updata To Local Storage 
+    addDataToLocalStorageFrom(arrayOfTasks);
+    addElementsToPageFrom(arrayOfTasks)
 }
 
 
